@@ -46,9 +46,6 @@ class MainActivity : AppCompatActivity() {
         binding.btnPrev.setOnClickListener { sendAction("ACTION_PREVIOUS") }
     }
 
-    // ───────────────────────────────────────────────
-    //                XIN QUYỀN THÔNG BÁO
-    // ───────────────────────────────────────────────
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val granted = ContextCompat.checkSelfPermission(
@@ -66,9 +63,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ───────────────────────────────────────────────
-    //           LẤY DANH SÁCH NHẠC
-    // ───────────────────────────────────────────────
     private fun loadMusicFiles() {
         val selection = "${MediaStore.Audio.Media.DATA} LIKE ?"
         val selectionArgs = arrayOf("%/Music/Music/%")
@@ -111,9 +105,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ───────────────────────────────────────────────
-    //                  QUYỀN LƯU TRỮ
-    // ───────────────────────────────────────────────
     private fun checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
@@ -178,9 +169,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ───────────────────────────────────────────────
-    //           GỬI ACTION CHO SERVICE
-    // ───────────────────────────────────────────────
+
     private fun startMusicService() {
         val intent = Intent(this, MusicService::class.java).apply {
             action = "ACTION_START"

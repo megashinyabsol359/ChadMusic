@@ -14,9 +14,6 @@ class MediaPlayerManager(private val context: Context) {
     private val TAG = "MediaPlayerManager"
 
 
-    // ───────────────────────────────────────────────
-    //                QUẢN LÝ PLAYLIST
-    // ───────────────────────────────────────────────
     fun setPlaylist(paths: ArrayList<String>, titles: ArrayList<String>) {
         playlist = paths
         titleList = titles
@@ -27,9 +24,6 @@ class MediaPlayerManager(private val context: Context) {
     fun getCurrentTitle(): String = titleList.getOrNull(currentIndex) ?: "Không có tiêu đề"
 
 
-    // ───────────────────────────────────────────────
-    //                   PHÁT BÀI HÁT
-    // ───────────────────────────────────────────────
     fun play() {
         if (playlist.isEmpty()) return
 
@@ -41,7 +35,6 @@ class MediaPlayerManager(private val context: Context) {
             return
         }
 
-        // Nếu đang phát → và gọi play() từ notification → bỏ qua
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             return
         }
@@ -69,9 +62,6 @@ class MediaPlayerManager(private val context: Context) {
     }
 
 
-    // ───────────────────────────────────────────────
-    //                       PAUSE
-    // ───────────────────────────────────────────────
     fun pause() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
@@ -79,9 +69,6 @@ class MediaPlayerManager(private val context: Context) {
     }
 
 
-    // ───────────────────────────────────────────────
-    //                   NEXT BÀI
-    // ───────────────────────────────────────────────
     fun next() {
         if (playlist.isEmpty()) return
 
@@ -90,9 +77,6 @@ class MediaPlayerManager(private val context: Context) {
     }
 
 
-    // ───────────────────────────────────────────────
-    //                 PREVIOUS BÀI
-    // ───────────────────────────────────────────────
     fun previous() {
         if (playlist.isEmpty()) return
 
@@ -100,16 +84,11 @@ class MediaPlayerManager(private val context: Context) {
         forceRestartSong()
     }
 
-
-    // ───────────────────────────────────────────────
-    //          Reset & play khi NEXT/PREV
-    // ───────────────────────────────────────────────
     private fun forceRestartSong() {
         resetPlayer()
         mediaPlayer = null
         play()
     }
-
 
     private fun resetPlayer() {
         try {
@@ -122,18 +101,11 @@ class MediaPlayerManager(private val context: Context) {
         mediaPlayer = null
     }
 
-
-    // ───────────────────────────────────────────────
-    //                   CHECK PLAYING?
-    // ───────────────────────────────────────────────
     fun isPlaying(): Boolean {
         return mediaPlayer?.isPlaying ?: false
     }
 
 
-    // ───────────────────────────────────────────────
-    //                     RELEASE
-    // ───────────────────────────────────────────────
     fun release() {
         resetPlayer()
     }

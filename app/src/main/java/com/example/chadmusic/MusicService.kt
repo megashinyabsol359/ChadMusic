@@ -24,7 +24,6 @@ class MusicService : Service() {
         playerManager = MediaPlayerManager(this)
         notificationManager = MusicNotificationManager(this)
 
-        // MediaSession giúp notification hiện chuẩn
         mediaSession = MediaSession(this, "ChadMusicSession")
         val stateBuilder = PlaybackState.Builder()
             .setActions(
@@ -40,9 +39,6 @@ class MusicService : Service() {
     }
 
 
-    // ─────────────────────────────────────────────
-    //              Xử lý ACTION từ MainActivity
-    // ─────────────────────────────────────────────
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val action = intent?.action
@@ -94,9 +90,6 @@ class MusicService : Service() {
     }
 
 
-    // ─────────────────────────────────────────────
-    //         Cập nhật notification khi đổi bài
-    // ─────────────────────────────────────────────
     private fun updateNotification() {
         val notification = notificationManager.createNotification(
             playerManager.getCurrentTitle(),

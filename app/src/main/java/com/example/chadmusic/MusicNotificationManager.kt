@@ -73,7 +73,6 @@ class MusicNotificationManager(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Ảnh album
         val largeIcon = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
         return NotificationCompat.Builder(context, CHANNEL_ID)

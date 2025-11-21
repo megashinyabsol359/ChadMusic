@@ -6,7 +6,6 @@
     android:gravity="center"
     android:padding="20dp">
 
-    <!-- Tên bài hát đang phát -->
     <TextView
         android:id="@+id/txtCurrentSong"
         android:layout_width="wrap_content"
@@ -16,7 +15,6 @@
         android:textStyle="bold"
         android:padding="16dp" />
 
-    <!-- Button Play -->
     <Button
         android:id="@+id/btnPlay"
         android:layout_width="200dp"
@@ -24,7 +22,6 @@
         android:text="Play"
         android:layout_marginTop="20dp" />
 
-    <!-- Button Pause -->
     <Button
         android:id="@+id/btnPause"
         android:layout_width="200dp"
@@ -32,7 +29,6 @@
         android:text="Pause"
         android:layout_marginTop="10dp" />
 
-    <!-- Button Next -->
     <Button
         android:id="@+id/btnNext"
         android:layout_width="200dp"
@@ -40,7 +36,6 @@
         android:text="Next"
         android:layout_marginTop="10dp" />
 
-    <!-- Button Previous -->
     <Button
         android:id="@+id/btnPrev"
         android:layout_width="200dp"
