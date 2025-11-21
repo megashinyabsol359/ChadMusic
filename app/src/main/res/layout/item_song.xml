@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:text="Tên bài hát"
         android:textSize="16sp"
-        android:textColor="#000000" />
+        android:textColor="#FFFFFF" />
 
     <ImageView
         android:id="@+id/imgPlaying"

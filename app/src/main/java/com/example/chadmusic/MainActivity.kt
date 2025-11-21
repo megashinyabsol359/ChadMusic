@@ -1,7 +1,10 @@
 package com.example.chadmusic
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Build
@@ -11,11 +14,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chadmusic.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var musicAdapter: MusicAdapter
 
     private val REQUEST_CODE_STORAGE = 1001
     private val REQUEST_CODE_NOTIFICATION = 1002
@@ -28,11 +33,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Xin quyền storage + notification
+        // setup RecyclerView
+        musicAdapter = MusicAdapter(this, musicTitles)
+        binding.rvPlaylist.layoutManager = LinearLayoutManager(this)
+        binding.rvPlaylist.adapter = musicAdapter
+
+        // xin quyền
         checkStoragePermission()
         checkNotificationPermission()
 
-        // Nút phát nhạc
+        // nút chức năng
         binding.btnPlay.setOnClickListener {
             if (musicList.isEmpty()) {
                 Toast.makeText(this, "Không tìm thấy nhạc trong /Music/Music", Toast.LENGTH_SHORT).show()
@@ -45,6 +55,33 @@ class MainActivity : AppCompatActivity() {
         binding.btnNext.setOnClickListener { sendAction("ACTION_NEXT") }
         binding.btnPrev.setOnClickListener { sendAction("ACTION_PREVIOUS") }
     }
+
+    // ------------- NHẬN BROADCAST ĐỔI BÀI -------------
+    private val musicReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "MUSIC_CHANGED") {
+                val index = intent.getIntExtra("index", 0)
+
+                // highlight trong playlist
+                musicAdapter.setCurrentIndex(index)
+
+                // cập nhật tên bài
+                binding.txtCurrentSong.text = "Đang phát: ${musicTitles[index]}"
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(musicReceiver, IntentFilter("MUSIC_CHANGED"))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(musicReceiver)
+    }
+
+    // ---------------------------------------------------
 
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -85,11 +122,11 @@ class MainActivity : AppCompatActivity() {
 
         cursor?.use {
             val dataIndex = it.getColumnIndex(MediaStore.Audio.Media.DATA)
-            val nameIndex = it.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
+            val titleIndex = it.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
 
             while (it.moveToNext()) {
                 val path = if (dataIndex >= 0) it.getString(dataIndex) else null
-                val title = if (nameIndex >= 0) it.getString(nameIndex) else "Unknown"
+                val title = if (titleIndex >= 0) it.getString(titleIndex) else "Unknown"
 
                 if (path != null) {
                     musicList.add(path)
@@ -98,17 +135,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // cập nhật UI sau khi load xong
         if (musicList.isNotEmpty()) {
             binding.txtCurrentSong.text = "Tìm thấy ${musicList.size} bài"
         } else {
             binding.txtCurrentSong.text = "Không tìm thấy bài nào"
         }
+
+        musicAdapter.notifyDataSetChanged()
     }
 
     private fun checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 
-            // Android 13+
             val granted = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_MEDIA_AUDIO
@@ -124,7 +163,6 @@ class MainActivity : AppCompatActivity() {
 
         } else {
 
-            // Android 12-
             val granted = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
@@ -163,12 +201,15 @@ class MainActivity : AppCompatActivity() {
                 if (!(grantResults.isNotEmpty() &&
                             grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 ) {
-                    Toast.makeText(this, "Không bật quyền thông báo → không thấy notification", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        "Không bật quyền thông báo → không thấy notification",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
     }
-
 
     private fun startMusicService() {
         val intent = Intent(this, MusicService::class.java).apply {

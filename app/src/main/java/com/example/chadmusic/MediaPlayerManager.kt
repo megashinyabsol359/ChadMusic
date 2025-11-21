@@ -13,10 +13,9 @@ class MediaPlayerManager(private val context: Context) {
 
     private val TAG = "MediaPlayerManager"
 
+    // Callback thông báo bài thay đổi
+    var onSongChanged: ((index: Int) -> Unit)? = null
 
-    // ───────────────────────────────────────────────
-    //                QUẢN LÝ PLAYLIST
-    // ───────────────────────────────────────────────
     fun setPlaylist(paths: ArrayList<String>, titles: ArrayList<String>) {
         playlist = paths
         titleList = titles
@@ -26,10 +25,6 @@ class MediaPlayerManager(private val context: Context) {
     fun getCurrentIndex(): Int = currentIndex
     fun getCurrentTitle(): String = titleList.getOrNull(currentIndex) ?: "Không có tiêu đề"
 
-
-    // ───────────────────────────────────────────────
-    //                   PHÁT BÀI HÁT
-    // ───────────────────────────────────────────────
     fun play() {
         if (playlist.isEmpty()) return
 
@@ -41,7 +36,6 @@ class MediaPlayerManager(private val context: Context) {
             return
         }
 
-        // Nếu đang phát → và gọi play() từ notification → bỏ qua
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             return
         }
@@ -68,72 +62,58 @@ class MediaPlayerManager(private val context: Context) {
         }
     }
 
-
-    // ───────────────────────────────────────────────
-    //                       PAUSE
-    // ───────────────────────────────────────────────
     fun pause() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
         }
     }
 
-
-    // ───────────────────────────────────────────────
-    //                   NEXT BÀI
-    // ───────────────────────────────────────────────
     fun next() {
         if (playlist.isEmpty()) return
 
         currentIndex = (currentIndex + 1) % playlist.size
+        onSongChanged?.invoke(currentIndex)
         forceRestartSong()
     }
 
-
-    // ───────────────────────────────────────────────
-    //                 PREVIOUS BÀI
-    // ───────────────────────────────────────────────
     fun previous() {
         if (playlist.isEmpty()) return
 
         currentIndex = if (currentIndex - 1 < 0) playlist.size - 1 else currentIndex - 1
+        onSongChanged?.invoke(currentIndex)
         forceRestartSong()
     }
 
+    // ------------------- HÀM MỚI: PHÁT BÀI THEO INDEX -------------------
+    fun playAt(index: Int) {
+        if (index in playlist.indices) {
+            currentIndex = index
+            onSongChanged?.invoke(currentIndex)
+            forceRestartSong()
+        }
+    }
+    // ----------------------------------------------------------------------
 
-    // ───────────────────────────────────────────────
-    //          Reset & play khi NEXT/PREV
-    // ───────────────────────────────────────────────
     private fun forceRestartSong() {
         resetPlayer()
         mediaPlayer = null
         play()
     }
 
-
     private fun resetPlayer() {
         try {
             mediaPlayer?.stop()
             mediaPlayer?.reset()
         } catch (e: Exception) {
-            // ignore
         }
         mediaPlayer?.release()
         mediaPlayer = null
     }
 
-
-    // ───────────────────────────────────────────────
-    //                   CHECK PLAYING?
-    // ───────────────────────────────────────────────
     fun isPlaying(): Boolean {
         return mediaPlayer?.isPlaying ?: false
     }
 
-
-    // ───────────────────────────────────────────────
-    //                     RELEASE
-    // ───────────────────────────────────────────────
     fun release() {
         resetPlayer()
     }

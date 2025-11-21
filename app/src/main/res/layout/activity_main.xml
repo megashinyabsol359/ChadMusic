@@ -3,10 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="20dp">
 
-    <!-- Tên bài hát đang phát -->
+    <!-- Tên bài đang phát -->
     <TextView
         android:id="@+id/txtCurrentSong"
         android:layout_width="wrap_content"
@@ -14,38 +13,55 @@
         android:text="Chưa phát bài nào"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal" />
 
-    <!-- Button Play -->
-    <Button
-        android:id="@+id/btnPlay"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Play"
-        android:layout_marginTop="20dp" />
+    <!-- Danh sách playlist -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp" />
 
-    <!-- Button Pause -->
-    <Button
-        android:id="@+id/btnPause"
-        android:layout_width="200dp"
+    <!-- Khu điều khiển nhạc -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pause"
-        android:layout_marginTop="10dp" />
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <!-- Button Next -->
-    <Button
-        android:id="@+id/btnNext"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Next"
-        android:layout_marginTop="10dp" />
+        <Button
+            android:id="@+id/btnPlay"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:layout_marginTop="10dp" />
 
-    <!-- Button Previous -->
-    <Button
-        android:id="@+id/btnPrev"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Previous"
-        android:layout_marginTop="10dp" />
+        <Button
+            android:id="@+id/btnPause"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Pause"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:layout_marginTop="10dp" />
+
+        <Button
+            android:id="@+id/btnPrev"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Previous"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp" />
+
+    </LinearLayout>
 
 </LinearLayout>
