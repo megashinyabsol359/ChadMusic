@@ -27,8 +27,10 @@ class MusicNotificationManager(private val context: Context) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Music Player",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_HIGH // Nổi bật ở đầu thanh trạng thái
             )
+            channel.enableLights(false)
+            channel.enableVibration(false)
             val manager = context.getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
@@ -48,12 +50,12 @@ class MusicNotificationManager(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // PLAY / PAUSE
-        val playIntent = Intent(context, MusicService::class.java).apply {
-            action = if (isPlaying) "ACTION_PAUSE" else "ACTION_PLAY"
+        // PLAY / PAUSE → toggle
+        val toggleIntent = Intent(context, MusicService::class.java).apply {
+            action = "ACTION_TOGGLE_PLAY"
         }
-        val playPending = PendingIntent.getService(
-            context, 1, playIntent,
+        val togglePending = PendingIntent.getService(
+            context, 1, toggleIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -84,11 +86,13 @@ class MusicNotificationManager(private val context: Context) {
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
             .setOngoing(isPlaying)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Nổi bật
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .addAction(R.drawable.ic_prev, "Previous", prevPending)
             .addAction(
                 if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play,
                 if (isPlaying) "Pause" else "Play",
-                playPending
+                togglePending
             )
             .addAction(R.drawable.ic_next, "Next", nextPending)
             .setStyle(
