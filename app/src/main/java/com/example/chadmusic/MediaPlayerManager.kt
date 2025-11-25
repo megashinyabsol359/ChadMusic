@@ -3,6 +3,7 @@ package com.example.chadmusic
 import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
+import kotlin.random.Random
 
 class MediaPlayerManager(private val context: Context) {
 
@@ -10,10 +11,10 @@ class MediaPlayerManager(private val context: Context) {
     private var playlist = ArrayList<String>()
     private var titleList = ArrayList<String>()
     private var currentIndex = 0
+    private var isShuffle = false  // <-- Bật/tắt shuffle
 
     private val TAG = "MediaPlayerManager"
 
-    // Callback thông báo bài thay đổi
     var onSongChanged: ((index: Int) -> Unit)? = null
 
     fun setPlaylist(paths: ArrayList<String>, titles: ArrayList<String>) {
@@ -24,6 +25,10 @@ class MediaPlayerManager(private val context: Context) {
 
     fun getCurrentIndex(): Int = currentIndex
     fun getCurrentTitle(): String = titleList.getOrNull(currentIndex) ?: "Không có tiêu đề"
+
+    fun toggleShuffle() {
+        isShuffle = !isShuffle
+    }
 
     fun play() {
         if (playlist.isEmpty()) return
@@ -43,7 +48,6 @@ class MediaPlayerManager(private val context: Context) {
         try {
             resetPlayer()
             mediaPlayer = MediaPlayer()
-
             mediaPlayer?.setDataSource(path)
 
             mediaPlayer?.setOnPreparedListener {
@@ -71,7 +75,12 @@ class MediaPlayerManager(private val context: Context) {
     fun next() {
         if (playlist.isEmpty()) return
 
-        currentIndex = (currentIndex + 1) % playlist.size
+        currentIndex = if (isShuffle) {
+            Random.nextInt(playlist.size)
+        } else {
+            (currentIndex + 1) % playlist.size
+        }
+
         onSongChanged?.invoke(currentIndex)
         forceRestartSong()
     }
@@ -79,12 +88,16 @@ class MediaPlayerManager(private val context: Context) {
     fun previous() {
         if (playlist.isEmpty()) return
 
-        currentIndex = if (currentIndex - 1 < 0) playlist.size - 1 else currentIndex - 1
+        currentIndex = if (isShuffle) {
+            Random.nextInt(playlist.size)
+        } else {
+            if (currentIndex - 1 < 0) playlist.size - 1 else currentIndex - 1
+        }
+
         onSongChanged?.invoke(currentIndex)
         forceRestartSong()
     }
 
-    // ------------------- HÀM MỚI: PHÁT BÀI THEO INDEX -------------------
     fun playAt(index: Int) {
         if (index in playlist.indices) {
             currentIndex = index
@@ -92,7 +105,6 @@ class MediaPlayerManager(private val context: Context) {
             forceRestartSong()
         }
     }
-    // ----------------------------------------------------------------------
 
     private fun forceRestartSong() {
         resetPlayer()

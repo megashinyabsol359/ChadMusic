@@ -31,16 +31,14 @@ class MusicAdapter(
 
         holder.txtTitle.text = titles[position]
 
-        // highlight bài đang phát
         if (position == currentIndex) {
             holder.imgPlaying.visibility = View.VISIBLE
-            holder.txtTitle.setTextColor(0xFFFFD700.toInt()) // vàng nổi bật
+            holder.txtTitle.setTextColor(0xFFFFD700.toInt())
         } else {
             holder.imgPlaying.visibility = View.GONE
-            holder.txtTitle.setTextColor(0xFF000000.toInt()) // trắng
+            holder.txtTitle.setTextColor(0xFF000000.toInt())
         }
 
-        // Click bài → gửi Service ACTION_PLAY_AT
         holder.itemView.setOnClickListener {
             val intent = Intent(context, MusicService::class.java).apply {
                 action = "ACTION_PLAY_AT"

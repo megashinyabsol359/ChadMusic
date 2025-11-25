@@ -28,24 +28,30 @@ class MainActivity : AppCompatActivity() {
     private var musicList = ArrayList<String>()
     private var musicTitles = ArrayList<String>()
 
+    private val intentFilter = IntentFilter().apply {
+        addAction("MUSIC_CHANGED")
+        addAction("PLAYLIST_CHANGED") // Thêm action lắng nghe thay đổi playlist
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // setup RecyclerView
         musicAdapter = MusicAdapter(this, musicTitles)
         binding.rvPlaylist.layoutManager = LinearLayoutManager(this)
         binding.rvPlaylist.adapter = musicAdapter
 
-        // xin quyền
         checkStoragePermission()
         checkNotificationPermission()
 
-        // nút chức năng
         binding.btnPlay.setOnClickListener {
             if (musicList.isEmpty()) {
-                Toast.makeText(this, "Không tìm thấy nhạc trong /Music/Music", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Không tìm thấy nhạc trong /Music/Music",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
             startMusicService()
@@ -54,34 +60,60 @@ class MainActivity : AppCompatActivity() {
         binding.btnPause.setOnClickListener { sendAction("ACTION_PAUSE") }
         binding.btnNext.setOnClickListener { sendAction("ACTION_NEXT") }
         binding.btnPrev.setOnClickListener { sendAction("ACTION_PREVIOUS") }
+
+        binding.btnShuffle.setOnClickListener {
+            sendAction("ACTION_SHUFFLE")
+            Toast.makeText(this, "Shuffle: bật/tắt", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // ------------- NHẬN BROADCAST ĐỔI BÀI -------------
     private val musicReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "MUSIC_CHANGED") {
-                val index = intent.getIntExtra("index", 0)
+            when (intent?.action) {
+                // Xử lý khi bài hát thay đổi (chuyển bài)
+                "MUSIC_CHANGED" -> {
+                    val index = intent.getIntExtra("index", 0)
+                    musicAdapter.setCurrentIndex(index) // Highlight item đang phát
 
-                // highlight trong playlist
-                musicAdapter.setCurrentIndex(index)
+                    val title = musicTitles.getOrNull(index) ?: "Không có tiêu đề"
+                    binding.txtCurrentSong.text = "Đang phát: $title"
+                }
 
-                // cập nhật tên bài
-                binding.txtCurrentSong.text = "Đang phát: ${musicTitles[index]}"
+                "PLAYLIST_CHANGED" -> {
+                    val newTitles = intent.getStringArrayListExtra("music_titles")
+                    val newPaths = intent.getStringArrayListExtra("music_list")
+
+                    if (newTitles != null && newPaths != null) {
+                        musicTitles.clear()
+                        musicTitles.addAll(newTitles)
+                        musicList.clear()
+                        musicList.addAll(newPaths)
+
+                        musicAdapter.notifyDataSetChanged()
+
+                        musicAdapter.setCurrentIndex(0)
+                        val title = musicTitles.getOrNull(0) ?: "Không có tiêu đề"
+                        binding.txtCurrentSong.text = "Đang phát: $title"
+                    }
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        registerReceiver(musicReceiver, IntentFilter("MUSIC_CHANGED"))
+        ContextCompat.registerReceiver(
+            this,
+            musicReceiver,
+            intentFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onPause() {
         super.onPause()
         unregisterReceiver(musicReceiver)
     }
-
-    // ---------------------------------------------------
 
     private fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -135,7 +167,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // cập nhật UI sau khi load xong
         if (musicList.isNotEmpty()) {
             binding.txtCurrentSong.text = "Tìm thấy ${musicList.size} bài"
         } else {
@@ -221,7 +252,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendAction(action: String) {
-        val intent = Intent(this, MusicService::class.java).apply { this.action = action }
+        val intent = Intent(this, MusicService::class.java).apply {
+            this.action = action
+        }
         startService(intent)
     }
 }

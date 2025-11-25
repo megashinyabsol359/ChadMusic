@@ -41,7 +41,6 @@ class MusicNotificationManager(private val context: Context) {
         isPlaying: Boolean
     ): Notification {
 
-        // PREVIOUS
         val prevIntent = Intent(context, MusicService::class.java).apply {
             action = "ACTION_PREVIOUS"
         }
@@ -50,7 +49,6 @@ class MusicNotificationManager(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // PLAY / PAUSE → toggle
         val toggleIntent = Intent(context, MusicService::class.java).apply {
             action = "ACTION_TOGGLE_PLAY"
         }
@@ -59,7 +57,6 @@ class MusicNotificationManager(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // NEXT
         val nextIntent = Intent(context, MusicService::class.java).apply {
             action = "ACTION_NEXT"
         }
@@ -68,7 +65,6 @@ class MusicNotificationManager(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Mở app khi bấm vào notification
         val openIntent = Intent(context, MainActivity::class.java)
         val contentPending = PendingIntent.getActivity(
             context, 3, openIntent,

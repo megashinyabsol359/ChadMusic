@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <!-- Tên bài đang phát -->
     <TextView
         android:id="@+id/txtCurrentSong"
         android:layout_width="wrap_content"
@@ -17,7 +16,6 @@
         android:gravity="center"
         android:layout_gravity="center_horizontal" />
 
-    <!-- Danh sách playlist -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPlaylist"
         android:layout_width="match_parent"
@@ -26,7 +24,6 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp" />
 
-    <!-- Khu điều khiển nhạc -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -59,6 +56,14 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="Previous"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+
+        <Button
+            android:id="@+id/btnShuffle"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Shuffle"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp" />
 
